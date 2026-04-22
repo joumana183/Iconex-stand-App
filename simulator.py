@@ -5,7 +5,6 @@ from PIL import Image
 import pdf2image
 
 # --- 1. الإعدادات والـ API Key ---
-# ضعي الـ API Key الخاص بكِ هنا
 API_KEY = "YOUR_GEMINI_API_KEY_HERE" 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -13,9 +12,7 @@ model = genai.GenerativeModel('gemini-1.5-flash')
 st.set_page_config(page_title="Iconex Master Pro", layout="wide", page_icon="💡")
 
 # --- 2. إظهار اللوجو في الواجهة ---
-# تأكدي أن الصورة على الديسكتوب اسمها logo.jpg أو logo.png
 try:
-    # جرب يفتح لوجو بامتداد jpg أو png
     try:
         icon_logo = Image.open("logo.jpg")
     except:
@@ -50,14 +47,14 @@ st.subheader("📂 رفع التصميم أو ملف PDF")
 uploaded_files = st.file_uploader("ارفع الصور أو ملفات المقايسة (PDF)", type=['jpg', 'png', 'jpeg', 'pdf'], accept_multiple_files=True)
 
 if "extracted_data" not in st.session_state: 
-    st.session_state.extracted_data = {"w": 150.0, "h": 300.0, "p": 1}
+    st.session_state.extracted_data = {"w": 150.0, "h": 300.0}
 
 input_data_list = []
 if uploaded_files:
     for uploaded_file in uploaded_files:
-      if uploaded_file.type == "application/pdf":
+        if uploaded_file.type == "application/pdf":
             try:
-                # هنا السيرفر سيتعامل مع الـ PDF تلقائياً بدون كتابة مسارات
+                # التحويل للـ Cloud بدون مسارات يدوية
                 images = pdf2image.convert_from_bytes(uploaded_file.read())
                 img = images[0]
                 st.image(img, caption=f"PDF: {uploaded_file.name}", use_container_width=True)
@@ -65,6 +62,7 @@ if uploaded_files:
             except Exception as e:
                 st.error(f"خطأ في قراءة الـ PDF: {e}")
         else:
+            # تم تصحيح المسافة هنا ليكون تحت الـ if بالظبط
             img = Image.open(uploaded_file)
             st.image(img, caption=uploaded_file.name, use_container_width=True)
             input_data_list.append(img)
@@ -78,8 +76,9 @@ if uploaded_files:
                     st.session_state.extracted_data["w"] = float(w)
                     st.session_state.extracted_data["h"] = float(h)
                     st.success("تم التحديث!")
+                    st.rerun()
                 except:
-                    st.error("يرجى مراجعة الـ API Key أو البيانات.")
+                    st.error("يرجى مراجعة الـ API Key أو جودة الصورة.")
 
 # --- 5. الحسابات النهائية ---
 st.subheader("📏 مدخلات المقايسة النهائية")
