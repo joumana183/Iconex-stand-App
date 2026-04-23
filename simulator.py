@@ -5,7 +5,7 @@ from PIL import Image
 import pdf2image
 
 # --- 1. الإعدادات والـ API Key ---
-API_KEY = "YOUR_GEMINI_API_KEY_HERE" 
+API_KEY = st.secrets["API_KEY"] 
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-1.5-flash')
 
